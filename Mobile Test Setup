@@ -1,0 +1,15 @@
+Step 1: On your Computer
+-In the matlab command window type: connector on
+-When prompted, enter a password that contains at least 5 alphanumeric characters. MATLAB stores the password for future sessions.
+-Note the DNS name or IP address that the command returns. This information is used to create a MATLAB Mobile connection.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Step 2: In MATLAB Mobile
+-Enter the DNS name or IP address of your computer, as displayed when you entered "connector on".
+-Enter the password you created in Step 1.
+-Tap "Connect"
+-Go to "Sensors" (from the more tab at the bottom)
+-Tap the roll, pitch, yaw symbol (the middle of the 5 at the top of the screen).
+-Make sure stream to MATLAB is checked.
+-Tap "START"
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Step 3: Run mobiletest.m
