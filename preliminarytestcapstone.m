@@ -81,7 +81,7 @@ cspice_furnsh('naif0010.tls');
 %         1900 JAN 04 00:00:41.184            2100 JAN 01 00:01:07.183
 %
 
-tprime = (5/4)*10540800; %four months %use 2 months for GTO initial conditions
+tprime = 10540800; %four months %use 2 months for GTO initial conditions
 tinterval = 5*60;%25 second interval%60*60*6; %time interval in seconds
 tinstance = tprime/tinterval;
 start = cspice_str2et('April 20 2033');
@@ -106,18 +106,31 @@ state_l = state_l';
 
 % assuming approximate 4 month trip, use 8 month arbitrary "Tom Petty Wait
 % Time"
-tprime2 = 2*10540800; %8months
-tinterval2 = 5*60;
-tinstance2 = tprime2/tinterval2;
-start2 = cspice_str2et('August 20 2033');
-et2 = (0:tinstance2)*tinterval2 + start2;
+% tprime2 = 2*10540800; %8months
+% tinterval2 = 5*60;
+% tinstance2 = tprime2/tinterval2;
+% start2 = cspice_str2et('August 20 2033');
+% et2 = (0:tinstance2)*tinterval2 + start2;
+% 
+% [between_e,lbetween_e] = cspice_spkezr('EARTH BARYCENTER',et2,'J2000','LT+S','SOLAR SYSTEM BARYCENTER');
+% [between_m,lbetween_m] = cspice_spkezr('MARS BARYCENTER',et2,'J2000','LT+S','SOLAR SYSTEM BARYCENTER');
+% [between_j,lbetween_j] = cspice_spkezr('JUPITER BARYCENTER',et2,'J2000','LT+S','SOLAR SYSTEM BARYCENTER');
+% between_e = between_e';
+% between_m = between_m';
+% between_j = between_j';
 
-[between_e,lbetween_e] = cspice_spkezr('EARTH BARYCENTER',et2,'J2000','LT+S','SOLAR SYSTEM BARYCENTER');
-[between_m,lbetween_m] = cspice_spkezr('MARS BARYCENTER',et2,'J2000','LT+S','SOLAR SYSTEM BARYCENTER');
-[between_j,lbetween_j] = cspice_spkezr('JUPITER BARYCENTER',et2,'J2000','LT+S','SOLAR SYSTEM BARYCENTER');
-between_e = between_e';
-between_m = between_m';
-between_j = between_j';
+    tprime2 = 3*10540800; %12months %for mission one
+    tinterval2 = 5*60;
+    tinstance2 = tprime2/tinterval2;
+    start2 = cspice_str2et('June 20 2033');
+    et2 = (0:tinstance2)*tinterval2 + start2;
+
+    [between_e,lbetween_e] = cspice_spkezr('EARTH BARYCENTER',et2,'J2000','LT+S','SOLAR SYSTEM BARYCENTER');
+    [between_m,lbetween_m] = cspice_spkezr('MARS BARYCENTER',et2,'J2000','LT+S','SOLAR SYSTEM BARYCENTER');
+    [between_j,lbetween_j] = cspice_spkezr('JUPITER BARYCENTER',et2,'J2000','LT+S','SOLAR SYSTEM BARYCENTER');
+    between_e = between_e';
+    between_m = between_m';
+    between_j = between_j';
 
 tprime3 = 10540800;
 tinterval3 = 5*60;
@@ -142,7 +155,7 @@ ma = length(state_m(:,1));
 
 % Define Constants
 G      = 6.67408*10^-20;    % Gravitational Constant [km^3/kgs^2]
-g_o    = .00981;            % Earth's gravitational paramater [km/s^2]
+g_o    = .00981;            % Earth's gravitational parameter [km/s^2]
 
 m_e    = 5.9723*10^24;      % Mass of Earth [kg]
 m_m    = 641.9*10^21;       % Mass of Mars [kg]
@@ -275,7 +288,7 @@ d = 1;
 burntime = 0;
 del_v_out = 0;
 
-fun = @(x) 111./(9700-mdotavg*(x+burntime));
+fun = @(x) 111./(9700-mdotavg*(x));
 
    for i=1:length(t)
       if i>=0 && i<= 5%1500 %25 minute burn
@@ -283,10 +296,10 @@ fun = @(x) 111./(9700-mdotavg*(x+burntime));
           del_v_out = del_v_out + integral(fun,0,300);
           burntime = burntime + 5*60; %5 minute time intervals for burns
           
-%       elseif i>=17000 && i<=17002 %this one is for mission3
-%           THRUST(i) = MaxMag;
-%           del_v_out = del_v_out + integral(fun,0,300);
-%           burntime = burntime + 5*60; %5 minute time intervals for burns
+      elseif i>=17000 && i<=17002 %this one is for mission3
+          THRUST(i) = MaxMag;
+          del_v_out = del_v_out + integral(fun,0,300);
+          burntime = burntime + 5*60; %5 minute time intervals for burns
           
 %       elseif i>=17568 && i<=17573
 %           THRUST(i) = MaxMag;
@@ -384,12 +397,12 @@ fprintf('Outbound Trajectory Length:        %.f Days\n',outbound_days)
 v_mag = sqrt(vxout.^2+vyout.^2+vzout.^2);    % Velocity magnitude string [km/s]
 r_mag = sqrt(xout.^2+yout.^2+zout.^2);    % Radius magnitude string [km]
 
-indx = find(r_mag>=r_f_des);
-
-first = indx(1);
-
-v_final = sqrt(vxout(first)^2+vyout(first)^2+vzout(first)^2);    % Final velocity magnitude [km/s]
-r_final = sqrt(xout(first)^2+yout(first)^2+zout(first)^2);   % Final radius magnitude [km]
+% indx = find(r_mag>=r_f_des);
+% 
+% first = indx(1);
+% 
+% v_final = sqrt(vxout(first)^2+vyout(first)^2+vzout(first)^2);    % Final velocity magnitude [km/s]
+% r_final = sqrt(xout(first)^2+yout(first)^2+zout(first)^2);   % Final radius magnitude [km]
 %t_final = t(first)/86400;                % Time on transit [days]
 fprintf('Desired radius at rendezvous: %.4f [AU]\n',r_f_des/AU)
 fprintf('Desired velocity at rendezvous: %.2f [km/s]\n',V_cap)
@@ -401,8 +414,8 @@ mp_spent = mdotavg*burntime; %9700-m(length(t));     % Mass of fuel spent [kg]
 mp_left = 9000-mp_spent;    % Mass of fuel left [kg]
 fprintf('Initial fuel mass: %.2f [kg]\n\n',mp_o)
 
-fprintf('Velocity at rendezvous: %.2f [km/s]\n',v_final)
-fprintf('Radius at rendezvous: %.4f [AU]\n',r_final/AU)
+% fprintf('Velocity at rendezvous: %.2f [km/s]\n',v_final)
+% fprintf('Radius at rendezvous: %.4f [AU]\n',r_final/AU)
 fprintf('Propellant mass left: %.2f [kg]\n',mp_left)
 fprintf('Time on transit: %.2f [days]\n',outbound_days)
 % 
@@ -412,11 +425,11 @@ fprintf('Time on transit: %.2f [days]\n',outbound_days)
 % 
 dV_p_cap = sqrt(V_cap^2+(2*u_m/r_p_cap))-sqrt(u_m*(1+e_cap)/r_p_cap);
 
-e_cap_actual = ((v_final^2)*r_p_cap/u_m)-1;      % Actual eccentricity of capture orbit
-dV_p_cap_actual = sqrt(v_final^2+(2*u_m/r_p_cap))-sqrt(u_m*(1+e_cap_actual)/r_p_cap);   % Actual dV required to ellipticize [km/s]
+% e_cap_actual = ((v_final^2)*r_p_cap/u_m)-1;      % Actual eccentricity of capture orbit
+% dV_p_cap_actual = sqrt(v_final^2+(2*u_m/r_p_cap))-sqrt(u_m*(1+e_cap_actual)/r_p_cap);   % Actual dV required to ellipticize [km/s]
 
-fprintf('New eccentricity of Martian elliptical orbit based off of hyperbolic excess velocity: %.4f\n',e_cap_actual)
-fprintf('Actual dV required at perigee: %.3f [km/s]\n',dV_p_cap_actual)
+% fprintf('New eccentricity of Martian elliptical orbit based off of hyperbolic excess velocity: %.4f\n',e_cap_actual)
+% fprintf('Actual dV required at perigee: %.3f [km/s]\n',dV_p_cap_actual)
 % 
 % MR = exp(-dV_p_cap_actual/(850*g_o));
 % m_req = MR*mp_left;
@@ -436,7 +449,14 @@ fprintf('Interplanetary Transit Delta-V: %.3f [km/s]\n',del_v_out)
 % efficient. We'll have to experiment (or replace it with Kevin magic).
 
 % posit=plot3(X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,X4,Y4,Z4,x1,y1,z1,'ob',x2,y2,z2,'or',x3,y3,z3,'oy',x4,y4,z4,'ok');
-positfull = plot3(state_e(:,1),state_e(:,2),state_e(:,3),'-ob',state_m(:,1),state_m(:,2),state_m(:,3),'-or',state_j(:,1),state_j(:,2),state_j(:,3),'-om',state_p(:,1),state_p(:,2),state_p(:,3),'-xk',state_l(:,1),state_l(:,2),state_l(:,3),'-xc',state_d(:,1),state_d(:,2),state_d(:,3),'-xy',xout,yout,zout,'og',0,0,0,'oy',between_e(:,1),between_e(:,2),between_e(:,3),'ob',between_m(:,1),between_m(:,2),between_m(:,3),'or',between_j(:,1),between_j(:,2),between_j(:,3),'om',return_e(:,1),return_e(:,2),return_e(:,3),'ob',return_m(:,1),return_m(:,2),return_m(:,3),'or',return_j(:,1),return_j(:,2),return_j(:,3),'om',xreturn,yreturn,zreturn,'og');
+positfull = plot3(state_e(:,1),state_e(:,2),state_e(:,3),'-ob',state_m(:,1),state_m(:,2),state_m(:,3),'-or',state_p(:,1),state_p(:,2),state_p(:,3),'-xk',state_l(:,1),state_l(:,2),state_l(:,3),'-xc',state_d(:,1),state_d(:,2),state_d(:,3),'-xy',xout,yout,zout,'og',between_e(:,1),between_e(:,2),between_e(:,3),'ob',between_m(:,1),between_m(:,2),between_m(:,3),'or',return_e(:,1),return_e(:,2),return_e(:,3),'ob',return_m(:,1),return_m(:,2),return_m(:,3),'or',xreturn,yreturn,zreturn,'og',state_j(:,1),state_j(:,2),state_j(:,3),'-om',between_j(:,1),between_j(:,2),between_j(:,3),'om',return_j(:,1),return_j(:,2),return_j(:,3),'om',return_j(:,1),return_j(:,2),return_j(:,3),'om');
+hold on
+[s1,s2,s3] = sphere;
+yellow = [1,1,0];
+surf(s1*695510*20,s2*695510*20,s3*695510*20) %20 times larger than actual
+colormap(yellow)
+% plot3(0,0,0,'oy','MarkerSize',10,'MarkerFaceColor','y')
+hold off
 title('Positions as a function of t (Heliocentric)');
 xlabel('x');
 ylabel('y');
@@ -450,8 +470,13 @@ figure
 %issues with sizes of matrices when trying to center plot at Mars
 
 %change this to plot mars as a circle of appropriate radius
-jo = length(x);
-positmars = plot3(0,0,0,'or',state_p(:,1)-state_m(:,1),state_p(:,2)-state_m(:,2),state_p(:,3)-state_m(:,3),'-xk',state_d(:,1)-state_m(:,1),state_d(:,2)-state_m(:,2),state_d(:,3)-state_m(:,3),'-xy',xout(ma)-state_m(ma,1),yout(ma)-state_m(ma,2),zout(ma)-state_m(ma,3),'og');
+positmars = plot3(state_p(:,1)-state_m(:,1),state_p(:,2)-state_m(:,2),state_p(:,3)-state_m(:,3),'-xk',state_d(:,1)-state_m(:,1),state_d(:,2)-state_m(:,2),state_d(:,3)-state_m(:,3),'-xy',xout(ma)-state_m(ma,1),yout(ma)-state_m(ma,2),zout(ma)-state_m(ma,3),'og');
+hold on
+[s1,s2,s3] = sphere;
+red = [1,0,0];
+surf(s1*r_m,s2*r_m,s3*r_m)
+colormap(red)
+hold off
 title('Positions as a function of t (Mars-Centered)');
 xlabel('x');
 ylabel('y');
